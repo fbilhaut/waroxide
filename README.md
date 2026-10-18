@@ -54,13 +54,22 @@ cargo build --release            # native dialogs in the launcher (rfd)
 cargo build --release --no-default-features   # console-only launcher
 ```
 
-The launcher's install paths are set at build time, as in the CMake build:
+The launcher's install paths can be set at build time, as in the CMake
+build (the macOS app needs none of them):
 
-- `WARGUS_DATA_PATH`: shared data directory (default `/usr/local/share/games/stratagus/wargus`)
-- `WARGUS_SCRIPTS_PATH`: directory with the Wargus `scripts/`, `maps/`, `campaigns/`, `shaders/`, `contrib/` (defaults to the data path)
-- `STRATAGUS_BIN`: the engine (default `stratagus`, looked up on `PATH`)
+- `WARGUS_DATA_PATH`: an already-extracted, shared data directory to use if
+  present (default `/usr/local/share/games/stratagus/wargus`). Otherwise,
+  and for every new extraction, the per-user directory is used
+  (`~/Library/Application Support/Stratagus/data.Wargus` on macOS).
+- `WARGUS_SCRIPTS_PATH`: directory with the Wargus `scripts/`, `maps/`,
+  `campaigns/`, `shaders/`, `contrib/` (defaults to the data path).
+- `STRATAGUS_BIN`: the engine (default `stratagus`, looked up on `PATH`,
+  then next to the launcher).
 
-At runtime, `WARGUS_SCRIPTS_PATH` can also point to a Wargus checkout.
+At runtime the scripts are looked up in `WARGUS_SCRIPTS_PATH` (if set,
+e.g. a Wargus checkout), the app bundle's `Contents/Resources`, the
+build-time path, then the folder containing `wartool`. On Windows, the
+paths default to the launcher's own folder instead.
 
 ## Usage
 
