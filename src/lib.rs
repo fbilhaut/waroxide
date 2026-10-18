@@ -6,7 +6,7 @@
 //! * [`extract`]: the `wartool` data extractor, which converts the original
 //!   `.WAR` archives into PNG / WAV / MIDI / Lua files Stratagus can load,
 //! * [`pud`]: the PUD map converter (also exposed as `pudconvert`),
-//! * the `wargus` launcher binary.
+//! * the `waroxide` game launcher binary.
 //!
 //! The format decoders live in their own modules and are independent from
 //! the extraction driver, so they can be reused or tested in isolation.

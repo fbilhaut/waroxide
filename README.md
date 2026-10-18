@@ -1,11 +1,11 @@
-# orcrust
+# waroxide
 
 > [!WARNING]
 > This project was massively vibe-coded. **Expect no support.**
 > I just wanted to play Warcraft II with my kids on macOS. 
 > Use it as is, at your own risk.
 
-Play Warcraft II on a Mac: a self-contained `Wargus.app` that turns your
+Play Warcraft II on a Mac: a self-contained `Waroxide.app` that turns your
 own Warcraft II CD (or CD image) into a game you can play, alone or with
 others on the local network.
 
@@ -17,7 +17,7 @@ engine, with its native tools rewritten in Rust:
 |--------------|-----------------------------|-------------------------------------------------------------|
 | `wartool`    | `wartool.cpp`               | Extracts the original CD data into PNG/WAV/MIDI/Lua files   |
 | `pudconvert` | `pudconvert.cpp`, `pud.cpp` | Converts a `.pud` map to Stratagus `.smp.gz` / `.sms.gz`    |
-| `wargus`     | `wargus.cpp` + launcher     | Extracts on first run, then starts Stratagus on the data    |
+| `waroxide`   | `wargus.cpp` + launcher     | Extracts on first run, then starts Stratagus on the data    |
 
 The game itself still runs on the Stratagus engine with the Wargus Lua
 scripts. The extracted data is meant to match wartool 3.3.3's layout and
@@ -38,28 +38,28 @@ formats exactly, so data from either tool works with either launcher (see
   installed DOS copy isn't enough either: the music and videos archives
   stay on the CD.
 
-There is no prebuilt download for now: build `Wargus.dmg` yourself (see
+There is no prebuilt download for now: build `Waroxide.dmg` yourself (see
 [Building the macOS app](#building-the-macos-app)).
 
 ### Install
 
-Open `Wargus.dmg` and drag **Wargus** to **Applications**.
+Open `Waroxide.dmg` and drag **Waroxide** to **Applications**.
 
 The app is not notarized by Apple. If you copied it from another Mac or
 downloaded it, macOS refuses to open it the first time: try to open it,
 then go to **System Settings → Privacy & Security** and click
-**Open Anyway** (or run `xattr -dr com.apple.quarantine /Applications/Wargus.app`).
+**Open Anyway** (or run `xattr -dr com.apple.quarantine /Applications/Waroxide.app`).
 
 ### First launch
 
-1. Open Wargus. It asks for the game data: pick `REZDAT.WAR` on the
+1. Open Waroxide. It asks for the game data: pick `REZDAT.WAR` on the
    mounted CD, or the CD image (`.cue`, `.bin` or `.iso`).
 2. Wait while it extracts. It takes about half a minute, with no progress
    window. The game is converted, and with an image the soundtrack is
    encoded too.
 3. It asks whether to extract an additional expansion CD. Answer **No**,
    or **Yes** and pick the *Beyond the Dark Portal* CD if you have it.
-4. The game starts. From then on, opening Wargus goes straight to the game.
+4. The game starts. From then on, opening Waroxide goes straight to the game.
 
 The intro and cutscene videos are skipped unless `ffmpeg` with libtheora
 is installed (for example through Homebrew); the game plays fine without
@@ -67,7 +67,7 @@ them.
 
 ### Playing together on a LAN
 
-Every player needs Wargus on their own Mac, ideally the **same build of
+Every player needs Waroxide on their own Mac, ideally the **same build of
 the app** (Stratagus refuses players whose engine or scripts differ), and
 their own extracted data (CDs from different countries work together).
 
@@ -75,7 +75,7 @@ their own extracted data (CDs from different countries work together).
 - The others choose **Join Game**: games on the network are listed with
   "(auto-discovered)". Otherwise, use **Add server** with the host's IP
   address.
-- The first time, macOS asks to allow Wargus on the local network: allow
+- The first time, macOS asks to allow Waroxide on the local network: allow
   it. With the macOS firewall on, the host must also accept incoming
   connections.
 
@@ -89,7 +89,7 @@ The game uses UDP port 6660.
 - `~/Library/Application Support/Stratagus/wc2`: settings and saved games.
 
 The app itself is never modified. To start over (another CD, or after a
-problem), quit Wargus and delete `data.Wargus`: the next launch asks for the
+problem), quit the game and delete `data.Wargus`: the next launch asks for the
 game data again. Deleting `wc2` also resets the settings and removes the
 saved games.
 
@@ -101,7 +101,7 @@ macos/build-app.sh
 ```
 
 This needs Rust and the Xcode command line tools, and produces
-`target/macos/Wargus.app` and `target/macos/Wargus.dmg`. The app contains
+`target/macos/Waroxide.app` and `target/macos/Waroxide.dmg`. The app contains
 the launcher and extractor, the Stratagus engine with its libraries, and the
 Wargus scripts; Stratagus and Wargus are fetched at pinned commits. It is
 ad-hoc signed only.
@@ -145,7 +145,7 @@ wartool -r war2.cue ~/Library/Application\ Support/Stratagus/data.Wargus
 pudconvert mymap.pud [outdir]
 
 # Launch the game (extracting first if needed)
-wargus [--extract | --extract-no-gui | path/to/REZDAT.WAR | war2.cue]
+waroxide [--extract | --extract-no-gui | path/to/REZDAT.WAR | war2.cue]
 ```
 
 CD images can be `.cue`/`.bin` pairs (any track layout, raw or cooked

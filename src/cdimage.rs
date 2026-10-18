@@ -398,7 +398,7 @@ mod tests {
     use super::*;
 
     fn temp_dir(name: &str) -> PathBuf {
-        let d = std::env::temp_dir().join(format!("orcrust-{name}-{}", std::process::id()));
+        let d = std::env::temp_dir().join(format!("waroxide-{name}-{}", std::process::id()));
         std::fs::create_dir_all(&d).unwrap();
         d
     }

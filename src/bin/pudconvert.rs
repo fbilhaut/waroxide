@@ -37,7 +37,7 @@ fn main() -> ExitCode {
         None => &file_name,
     };
 
-    match orcrust::pud::convert_file(input, name, &outdir) {
+    match waroxide::pud::convert_file(input, name, &outdir) {
         Ok(()) => ExitCode::SUCCESS,
         Err(e) => {
             eprintln!("{e:#}");

@@ -107,7 +107,7 @@ mod tests {
 
     #[test]
     fn encodes_a_tone() {
-        let dir = std::env::temp_dir().join(format!("orcrust-ogg-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("waroxide-ogg-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         let samples: Vec<u8> = (0..44100)
             .flat_map(|i| {

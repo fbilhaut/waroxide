@@ -1,5 +1,5 @@
 #!/bin/bash
-# Smoke-test LAN multiplayer with the engine bundled in Wargus.app, on one
+# Smoke-test LAN multiplayer with the engine bundled in Waroxide.app, on one
 # Mac: (1) a waiting host is found by mDNS auto-discovery, like in the Join
 # menu, then (2) a host and a client start a 2-player game, the client
 # joining through the LAN address (not loopback). Small game windows open
@@ -13,7 +13,7 @@ set -uo pipefail
 DATA="${1:?usage: $0 <extracted-data-dir> [host-ip]}"
 IP="${2:-$(ipconfig getifaddr en0 || ipconfig getifaddr en1)}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd -P)"
-ENGINE="$ROOT/target/macos/Wargus.app/Contents/MacOS/stratagus"
+ENGINE="$ROOT/target/macos/Waroxide.app/Contents/MacOS/stratagus"
 MAP="maps/skirmish/multiplayer/(2)timeless-isle.smp.gz"
 PORT=6661
 RUN_AFTER_START=10

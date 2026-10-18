@@ -37,7 +37,7 @@ pub const VERSION: &str = "3.3.3";
 pub const NAME_LINE: &str = concat!(
     "wartool V3.3.3 for Stratagus, (c) 1998-2022 by The Stratagus Project.\n",
     "  Written by Lutz Sammer, Nehal Mistry, Jimmy Salmon, Pali Rohar and cybermind.\n",
-    "  Rust port by the orcrust project.\n",
+    "  Rust port: waroxide.\n",
     "  https://wargus.github.io"
 );
 
@@ -902,7 +902,7 @@ mod tests {
 
     #[test]
     fn campaign_objectives() {
-        let dir = std::env::temp_dir().join(format!("orcrust-campaign-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("waroxide-campaign-{}", std::process::id()));
         let mut ex = extractor();
         ex.dir = dir.to_string_lossy().into_owned();
 

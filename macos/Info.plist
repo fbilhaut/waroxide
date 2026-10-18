@@ -3,13 +3,13 @@
 <plist version="1.0">
 <dict>
   <key>CFBundleName</key>
-  <string>Wargus</string>
+  <string>Waroxide</string>
   <key>CFBundleDisplayName</key>
-  <string>Wargus</string>
+  <string>Waroxide</string>
   <key>CFBundleExecutable</key>
-  <string>wargus</string>
+  <string>waroxide</string>
   <key>CFBundleIdentifier</key>
-  <string>com.github.orcrust.wargus</string>
+  <string>io.github.waroxide</string>
   <key>CFBundleIconFile</key>
   <string>wargus</string>
   <key>CFBundlePackageType</key>
@@ -25,6 +25,6 @@
   <key>NSHighResolutionCapable</key>
   <true/>
   <key>NSLocalNetworkUsageDescription</key>
-  <string>Wargus uses the local network to find and join multiplayer games on your LAN.</string>
+  <string>Waroxide uses the local network to find and join multiplayer games on your LAN.</string>
 </dict>
 </plist>

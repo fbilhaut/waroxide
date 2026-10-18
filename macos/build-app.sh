@@ -1,5 +1,5 @@
 #!/bin/bash
-# Build a self-contained Wargus.app (and a .dmg) for Apple Silicon Macs.
+# Build a self-contained Waroxide.app (and a .dmg) for Apple Silicon Macs.
 #
 # The app contains the Rust launcher and extractor from this repository,
 # the Stratagus engine with the libraries it needs, and the Wargus game
@@ -8,7 +8,7 @@
 # Requirements (build machine only): Xcode command line tools, Rust, and
 #   brew install cmake sdl2_mixer sdl2_image dylibbundler
 #
-# Usage: macos/build-app.sh            -> target/macos/Wargus.app, Wargus.dmg
+# Usage: macos/build-app.sh            -> target/macos/Waroxide.app, Waroxide.dmg
 set -euo pipefail
 
 STRATAGUS_REPO=https://github.com/Wargus/stratagus.git
@@ -18,7 +18,7 @@ WARGUS_COMMIT=57f9d4d2ee557c9d725cb830752e394f4fb00c51
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd -P)"
 WORK="$ROOT/target/macos"
-APP="$WORK/Wargus.app"
+APP="$WORK/Waroxide.app"
 VERSION="$(sed -n 's/^version = "\(.*\)"/\1/p' "$ROOT/Cargo.toml" | head -1)"
 
 step() { printf '\n==> %s\n' "$*"; }
@@ -56,12 +56,12 @@ cmake -S "$WORK/stratagus" -B "$WORK/build-stratagus" \
 cmake --build "$WORK/build-stratagus" -j "$(sysctl -n hw.ncpu)" >/dev/null
 
 step "Building the launcher and extractor"
-cargo build --release --manifest-path "$ROOT/Cargo.toml" --bin wargus --bin wartool
+cargo build --release --manifest-path "$ROOT/Cargo.toml" --bin waroxide --bin wartool
 
-step "Assembling Wargus.app"
+step "Assembling Waroxide.app"
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources" "$APP/Contents/libs"
-cp "$ROOT/target/release/wargus" "$ROOT/target/release/wartool" "$APP/Contents/MacOS/"
+cp "$ROOT/target/release/waroxide" "$ROOT/target/release/wartool" "$APP/Contents/MacOS/"
 cp "$WORK/build-stratagus/stratagus" "$APP/Contents/MacOS/"
 # The scripts, maps, campaigns, shaders and extra graphics the launcher
 # copies next to the extracted data.
@@ -106,13 +106,13 @@ for f in "$APP"/Contents/libs/*.dylib "$APP"/Contents/MacOS/*; do
     codesign --verify "$f" || { echo "error: bad signature on $f"; exit 1; }
 done
 
-step "Creating Wargus.dmg"
+step "Creating Waroxide.dmg"
 DMG_DIR="$WORK/dmg"
-rm -rf "$DMG_DIR" "$WORK/Wargus.dmg" && mkdir -p "$DMG_DIR"
+rm -rf "$DMG_DIR" "$WORK/Waroxide.dmg" && mkdir -p "$DMG_DIR"
 cp -R "$APP" "$DMG_DIR/"
 ln -s /Applications "$DMG_DIR/Applications"
-hdiutil create -quiet -volname Wargus -srcfolder "$DMG_DIR" -format UDZO "$WORK/Wargus.dmg"
+hdiutil create -quiet -volname Waroxide -srcfolder "$DMG_DIR" -format UDZO "$WORK/Waroxide.dmg"
 rm -rf "$DMG_DIR"
 
 MIN_OS="$(otool -l "$APP/Contents/libs/libSDL3.dylib" | awk '/LC_BUILD_VERSION/{f=1} f&&/minos/{print $2; exit}')"
-step "Done: $APP ($(du -sh "$APP" | cut -f1)), $WORK/Wargus.dmg (needs macOS $MIN_OS or later)"
+step "Done: $APP ($(du -sh "$APP" | cut -f1)), $WORK/Waroxide.dmg (needs macOS $MIN_OS or later)"

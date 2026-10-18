@@ -2,7 +2,7 @@
 
 use std::process::ExitCode;
 
-use orcrust::extract::{self, Options, NAME_LINE, VERSION};
+use waroxide::extract::{self, Options, NAME_LINE, VERSION};
 
 fn usage(name: &str) {
     println!(

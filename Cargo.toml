@@ -1,15 +1,15 @@
 [package]
-name = "orcrust"
+name = "waroxide"
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.75"
-description = "Rust port of the Wargus tools: Warcraft II data extractor, PUD converter and game launcher for Stratagus"
+description = "Warcraft II on macOS: Rust port of the Wargus tools (Warcraft II data extractor, PUD converter and game launcher for Stratagus)"
 license = "GPL-2.0-only"
 default-run = "wartool"
 
 [features]
 default = ["gui"]
-# Native message boxes and file pickers in the `wargus` launcher. Without it
+# Native message boxes and file pickers in the `waroxide` launcher. Without it
 # the launcher falls back to console prompts.
 gui = ["dep:rfd"]
 
@@ -29,8 +29,8 @@ name = "pudconvert"
 path = "src/bin/pudconvert.rs"
 
 [[bin]]
-name = "wargus"
-path = "src/bin/wargus/main.rs"
+name = "waroxide"
+path = "src/bin/waroxide/main.rs"
 
 [profile.release]
 lto = true

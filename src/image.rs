@@ -112,7 +112,7 @@ mod tests {
 
     #[test]
     fn writes_transparent_region() {
-        let dir = std::env::temp_dir().join(format!("orcrust-png-{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!("waroxide-png-{}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         let path = dir.join("t.png");
         let mut img = Indexed::new(4, 2, 7);

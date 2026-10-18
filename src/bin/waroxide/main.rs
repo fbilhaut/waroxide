@@ -1,4 +1,4 @@
-//! `wargus`: the game launcher.
+//! `waroxide`: the Wargus game launcher.
 //!
 //! Checks that the Warcraft II data has been extracted (running `wartool`
 //! if needed, after copying the Wargus scripts next to the data), then
@@ -14,7 +14,7 @@ use std::path::{Path, PathBuf};
 use std::process::{exit, Command};
 
 use dialogs::{Dialogs, Level};
-use orcrust::extract::REEXTRACT_MARKER_FILE;
+use waroxide::extract::REEXTRACT_MARKER_FILE;
 
 const GAME_NAME: &str = "Wargus";
 const GAME_CD: &str = "Warcraft II DOS CD (REZDAT.WAR) or CD image (.cue/.bin/.iso)";
@@ -172,7 +172,7 @@ impl Launcher {
         if let Some(p) = env::var_os("WARGUS_SCRIPTS_PATH") {
             candidates.push(PathBuf::from(p));
         }
-        // Inside a macOS app bundle: Contents/MacOS/wargus -> Contents/Resources.
+        // Inside a macOS app bundle: Contents/MacOS/waroxide -> Contents/Resources.
         if let Some(resources) = self.extractor.parent().and_then(Path::parent).map(|c| c.join("Resources")) {
             if resources.join("scripts").exists() {
                 candidates.push(resources);
