@@ -5,9 +5,13 @@
 > I just wanted to play Warcraft II with my kids on macOS. 
 > Use it as is, at your own risk.
 
-A Rust port of the native tools of [Wargus](https://github.com/Wargus/wargus),
-the Warcraft II mod for the [Stratagus](https://github.com/Wargus/stratagus)
-engine:
+Play Warcraft II on a Mac: a self-contained `Wargus.app` that turns your
+own Warcraft II CD (or CD image) into a game you can play, alone or with
+others on the local network.
+
+Under the hood it is [Wargus](https://github.com/Wargus/wargus), the
+Warcraft II mod for the [Stratagus](https://github.com/Wargus/stratagus)
+engine, with its native tools rewritten in Rust:
 
 | Binary       | Replaces                    | Does                                                        |
 |--------------|-----------------------------|-------------------------------------------------------------|
@@ -20,34 +24,92 @@ scripts. The extracted data is meant to match wartool 3.3.3's layout and
 formats exactly, so data from either tool works with either launcher (see
 "Checking against the original" below).
 
-## macOS app
+## Playing on macOS
 
-`macos/build-app.sh` builds a self-contained `Wargus.app` and `Wargus.dmg`
-(Apple Silicon) in `target/macos/`: the launcher and extractor, the
-Stratagus engine with its libraries, and the Wargus scripts. Players drag it
-to Applications, open it, pick their CD (`REZDAT.WAR`) or CD image
-(`.cue`/`.bin`/`.iso`), and play. Nothing else needs to be installed; the
-soundtrack is ripped from an image and encoded to Ogg Vorbis by `wartool`
-itself. The videos are only converted when `ffmpeg` (with libtheora) is
-installed, and are skipped otherwise.
+### What you need
 
-Building it needs Rust, the Xcode command line tools and
-`brew install cmake sdl2_mixer sdl2_image dylibbundler`. Stratagus and
-Wargus are fetched at pinned commits.
+- A Mac with Apple Silicon, running the macOS version the app was built on
+  or later (the build prints it; builds made on macOS 26 need macOS 26).
+- Your own **Warcraft II DOS CD** (*Tides of Darkness*, optionally the
+  *Beyond the Dark Portal* expansion), either as a mounted CD or as a CD
+  image: `.cue`/`.bin` (like the one a DOSBox setup uses) or `.iso`. An
+  image gives you the CD soundtrack too.
+- Not supported: the Battle.net edition, which is what GOG sells. An
+  installed DOS copy isn't enough either: the music and videos archives
+  stay on the CD.
 
-LAN multiplayer is Stratagus' own (UDP port 6660, hosts found automatically
-over mDNS or joined by IP). All players need the same engine and scripts, so
-everyone should use the same app build; their game data can come from
-different CDs. On first use macOS asks for Local Network access (and, with
-the firewall on, to accept incoming connections on the host).
-`macos/test-multiplayer.sh <data-dir>` checks discovery and a 2-player game
-between two instances on one Mac.
+There is no prebuilt download for now: build `Wargus.dmg` yourself (see
+[Building the macOS app](#building-the-macos-app)).
 
-The app is ad-hoc signed, not notarized: on another Mac, open it the first
-time with right-click → Open. The bundled Homebrew libraries require the
-macOS version they were built on (shown at the end of the build).
+### Install
 
-## Building
+Open `Wargus.dmg` and drag **Wargus** to **Applications**.
+
+The app is not notarized by Apple. If you copied it from another Mac or
+downloaded it, macOS refuses to open it the first time: try to open it,
+then go to **System Settings → Privacy & Security** and click
+**Open Anyway** (or run `xattr -dr com.apple.quarantine /Applications/Wargus.app`).
+
+### First launch
+
+1. Open Wargus. It asks for the game data: pick `REZDAT.WAR` on the
+   mounted CD, or the CD image (`.cue`, `.bin` or `.iso`).
+2. Wait while it extracts. It takes about half a minute, with no progress
+   window. The game is converted, and with an image the soundtrack is
+   encoded too.
+3. It asks whether to extract an additional expansion CD. Answer **No**,
+   or **Yes** and pick the *Beyond the Dark Portal* CD if you have it.
+4. The game starts. From then on, opening Wargus goes straight to the game.
+
+The intro and cutscene videos are skipped unless `ffmpeg` with libtheora
+is installed (for example through Homebrew); the game plays fine without
+them.
+
+### Playing together on a LAN
+
+Every player needs Wargus on their own Mac, ideally the **same build of
+the app** (Stratagus refuses players whose engine or scripts differ), and
+their own extracted data (CDs from different countries work together).
+
+- One player chooses **Multi Player Game → Create Game** and picks a map.
+- The others choose **Join Game**: games on the network are listed with
+  "(auto-discovered)". Otherwise, use **Add server** with the host's IP
+  address.
+- The first time, macOS asks to allow Wargus on the local network: allow
+  it. With the macOS firewall on, the host must also accept incoming
+  connections.
+
+The game uses UDP port 6660.
+
+### Where things are stored
+
+- `~/Library/Application Support/Stratagus/data.Wargus`: the extracted game
+  (about 170 MB, including a copy of the CD archives so it can be extracted
+  again without the CD).
+- `~/Library/Application Support/Stratagus/wc2`: settings and saved games.
+
+The app itself is never modified. To start over (another CD, or after a
+problem), quit Wargus and delete `data.Wargus`: the next launch asks for the
+game data again. Deleting `wc2` also resets the settings and removes the
+saved games.
+
+## Building the macOS app
+
+```sh
+brew install cmake sdl2_mixer sdl2_image dylibbundler
+macos/build-app.sh
+```
+
+This needs Rust and the Xcode command line tools, and produces
+`target/macos/Wargus.app` and `target/macos/Wargus.dmg`. The app contains
+the launcher and extractor, the Stratagus engine with its libraries, and the
+Wargus scripts; Stratagus and Wargus are fetched at pinned commits. It is
+ad-hoc signed only.
+
+`macos/test-multiplayer.sh <data-dir>` checks LAN discovery and a 2-player
+game between two instances of the bundled engine on one Mac.
+
+## Building the command-line tools
 
 ```sh
 cargo build --release            # native dialogs in the launcher (rfd)
@@ -71,7 +133,7 @@ e.g. a Wargus checkout), the app bundle's `Contents/Resources`, the
 build-time path, then the folder containing `wartool`. On Windows, the
 paths default to the launcher's own folder instead.
 
-## Usage
+## Command-line usage
 
 ```sh
 # Extract from the DOS CD (its root or its DATA directory)...
