@@ -1,5 +1,10 @@
 # orcrust
 
+> [!WARNING]
+> This project was massively vibe-coded. **Expect no support.**
+> I just wanted to play Warcraft II with my kids on macOS. 
+> Use it as is, at your own risk.
+
 A Rust port of the native tools of [Wargus](https://github.com/Wargus/wargus),
 the Warcraft II mod for the [Stratagus](https://github.com/Wargus/stratagus)
 engine:
