@@ -47,6 +47,11 @@ checkout "$STRATAGUS_REPO" "$STRATAGUS_COMMIT" "$WORK/stratagus"
 checkout "$WARGUS_REPO" "$WARGUS_COMMIT" "$WORK/wargus"
 
 step "Building Stratagus"
+# CMake caches absolute paths: start over if the checkout was moved.
+CACHE="$WORK/build-stratagus/CMakeCache.txt"
+if [ -f "$CACHE" ] && ! grep -q "^CMAKE_HOME_DIRECTORY:INTERNAL=$WORK/stratagus$" "$CACHE"; then
+    rm -rf "$WORK/build-stratagus"
+fi
 cmake -S "$WORK/stratagus" -B "$WORK/build-stratagus" \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_FIND_FRAMEWORK=LAST \
