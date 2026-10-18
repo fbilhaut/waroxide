@@ -20,6 +20,7 @@ pub mod control;
 pub mod extract;
 pub mod gfx;
 pub mod image;
+pub mod ogg;
 pub mod pud;
 pub mod rip_music;
 pub mod source;

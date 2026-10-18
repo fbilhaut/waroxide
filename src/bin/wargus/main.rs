@@ -172,6 +172,12 @@ impl Launcher {
         if let Some(p) = env::var_os("WARGUS_SCRIPTS_PATH") {
             candidates.push(PathBuf::from(p));
         }
+        // Inside a macOS app bundle: Contents/MacOS/wargus -> Contents/Resources.
+        if let Some(resources) = self.extractor.parent().and_then(Path::parent).map(|c| c.join("Resources")) {
+            if resources.join("scripts").exists() {
+                candidates.push(resources);
+            }
+        }
         if scripts_path.is_absolute() {
             candidates.push(scripts_path.to_path_buf());
         } else {

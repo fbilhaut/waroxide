@@ -15,6 +15,33 @@ scripts. The extracted data is meant to match wartool 3.3.3's layout and
 formats exactly, so data from either tool works with either launcher (see
 "Checking against the original" below).
 
+## macOS app
+
+`macos/build-app.sh` builds a self-contained `Wargus.app` and `Wargus.dmg`
+(Apple Silicon) in `target/macos/`: the launcher and extractor, the
+Stratagus engine with its libraries, and the Wargus scripts. Players drag it
+to Applications, open it, pick their CD (`REZDAT.WAR`) or CD image
+(`.cue`/`.bin`/`.iso`), and play. Nothing else needs to be installed; the
+soundtrack is ripped from an image and encoded to Ogg Vorbis by `wartool`
+itself. The videos are only converted when `ffmpeg` (with libtheora) is
+installed, and are skipped otherwise.
+
+Building it needs Rust, the Xcode command line tools and
+`brew install cmake sdl2_mixer sdl2_image dylibbundler`. Stratagus and
+Wargus are fetched at pinned commits.
+
+LAN multiplayer is Stratagus' own (UDP port 6660, hosts found automatically
+over mDNS or joined by IP). All players need the same engine and scripts, so
+everyone should use the same app build; their game data can come from
+different CDs. On first use macOS asks for Local Network access (and, with
+the firewall on, to accept incoming connections on the host).
+`macos/test-multiplayer.sh <data-dir>` checks discovery and a 2-player game
+between two instances on one Mac.
+
+The app is ad-hoc signed, not notarized: on another Mac, open it the first
+time with right-click → Open. The bundled Homebrew libraries require the
+macOS version they were built on (shown at the end of the build).
+
 ## Building
 
 ```sh
@@ -49,8 +76,9 @@ CD images can be `.cue`/`.bin` pairs (any track layout, raw or cooked
 sectors) or plain `.iso` files; the data track is read as ISO 9660 without
 mounting anything.
 
-`-v` converts the videos and needs an `ffmpeg` with libtheora. `-r` saves
-the CD audio soundtrack and converts it to Ogg Vorbis with `ffmpeg`: from
+`-v` converts the videos and needs an `ffmpeg` with libtheora (they are
+skipped without it). `-r` saves the CD audio soundtrack and encodes it to
+Ogg Vorbis (built in, no ffmpeg needed): from
 a `.cue`/`.bin` image it copies the audio tracks out; from a physical CD it
 needs `cdparanoia` (Linux only). Ripped music in `<cd>/music/*.wav|ogg` is
 picked up as well. Installed copies of the game lack `SNDDAT.WAR` and
@@ -78,9 +106,8 @@ Fixed bugs:
   twice to a shared buffer). It is now scaled once.
 - Corrupt or truncated input produces an error instead of out-of-bounds
   reads or writes.
-- Ripped music is explicitly encoded as Vorbis. Without libvorbis, ffmpeg
-  otherwise writes FLAC into the `.ogg` files, which SDL_mixer (used by
-  Stratagus) does not expect in an Ogg file.
+- Ripped music is encoded to Ogg Vorbis by `wartool` itself instead of
+  ffmpeg (which, built without libvorbis, writes FLAC into `.ogg` files).
 - MIDI events at the same tick keep their order (stable sort). The
   original's unstable sort could put a note-off right after the note-on it
   should precede, silencing notes.

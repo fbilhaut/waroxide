@@ -69,7 +69,7 @@ const FIRST_LEVEL_TEXT: usize = 6;
 pub struct Options {
     /// `Some(true)` for `-e`, `Some(false)` for `-n`, `None` to autodetect.
     pub expansion: Option<bool>,
-    /// `-v`: convert the videos (needs ffmpeg).
+    /// `-v`: convert the videos (needs ffmpeg; skipped if it is missing).
     pub video: bool,
     /// `-r`: rip the CD audio tracks (from a CD image, or with cdparanoia
     /// from the real CD).
@@ -538,8 +538,12 @@ impl Extractor {
         Ok(())
     }
 
-    /// Smacker video to Ogg Theora with ffmpeg.
+    /// Smacker video to Ogg Theora with ffmpeg. Skipped without ffmpeg; the
+    /// game runs without its videos.
     fn convert_video(&self, file: &str, video: i32) -> Result<()> {
+        if !ffmpeg_available() {
+            return Ok(());
+        }
         let smk = self.out(&format!("{file}.smk"));
         let ogv = self.out(&format!("{file}.ogv"));
         let backup = format!("{ogv}.bak");
@@ -614,7 +618,6 @@ impl Extractor {
     /// Convert ripped WAV music to OGG. Returns (WAV files found, converted).
     fn convert_music(&self) -> (usize, usize) {
         let bne: &[&str] = if self.cd.any(CdType::BNE) { BNE_MUSIC_NAMES } else { &[] };
-        let codec = vorbis_codec_args();
         let (mut found, mut converted) = (0, 0);
         for name in MUSIC_NAMES.iter().chain(bne) {
             let wav = self.out(&format!("{MUSIC_PATH}/{name}.wav"));
@@ -623,18 +626,16 @@ impl Extractor {
             }
             found += 1;
             let ogg = format!("{}/{MUSIC_PATH}/{name}.ogg", self.dir);
-            let ok = Command::new("ffmpeg")
-                .args(["-y", "-i", &wav])
-                .args(codec)
-                .arg(&ogg)
-                .status()
-                .map(|s| s.success())
-                .unwrap_or(false);
-            if ok {
-                let _ = fs::remove_file(&wav);
-                converted += 1;
-            } else {
-                println!("Can't convert wav sound {name} to ogg format. Is ffmpeg installed in PATH?");
+            println!("Encoding \"{name}\" to Ogg Vorbis");
+            match crate::ogg::encode_wav(Path::new(&wav), Path::new(&ogg)) {
+                Ok(()) => {
+                    let _ = fs::remove_file(&wav);
+                    converted += 1;
+                }
+                Err(e) => {
+                    let _ = fs::remove_file(&ogg);
+                    println!("Can't convert wav sound {name} to ogg format: {e:#}");
+                }
             }
         }
         (found, converted)
@@ -726,17 +727,16 @@ impl Extractor {
     }
 }
 
-/// ffmpeg arguments selecting a Vorbis encoder. Without them, an ffmpeg
-/// built without libvorbis silently puts FLAC in the `.ogg` file, which
-/// Stratagus (SDL_mixer) cannot play; fall back to ffmpeg's own encoder.
-fn vorbis_codec_args() -> &'static [&'static str] {
-    let encoders = Command::new("ffmpeg").args(["-hide_banner", "-encoders"]).output();
-    let has_libvorbis = encoders.is_ok_and(|o| String::from_utf8_lossy(&o.stdout).contains("libvorbis"));
-    if has_libvorbis {
-        &["-codec:a", "libvorbis"]
-    } else {
-        &["-codec:a", "vorbis", "-strict", "experimental"]
-    }
+/// Is ffmpeg (needed for the videos) on `PATH`?
+fn ffmpeg_available() -> bool {
+    static AVAILABLE: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *AVAILABLE.get_or_init(|| {
+        let ok = Command::new("ffmpeg").arg("-version").output().is_ok_and(|o| o.status.success());
+        if !ok {
+            println!("ffmpeg not found: skipping the videos");
+        }
+        ok
+    })
 }
 
 /// If the archives of an expansion CD were copied next to the data (see
